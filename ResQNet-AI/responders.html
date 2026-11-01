@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Responder Management | ResQNet AI</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<nav>
+    <div class="logo">ResQNet <span>AI</span></div>
+
+    <div class="nav-links">
+        <a href="/">Home</a>
+        <a href="/report">Report Emergency</a>
+        <a href="/dashboard">Command Center</a>
+        <a href="/map">Emergency Map</a>
+    </div>
+</nav>
+
+<main class="responder-page">
+
+    <header class="responder-header">
+        <p class="tag">RESPONSE OPERATIONS</p>
+        <h1>Responder Management</h1>
+
+        <p>
+            Register responders, assign incidents and update response status.
+        </p>
+    </header>
+
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="system-message {{ category }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- Add Responder -->
+    <section class="responder-panel">
+
+        <h2>Register a Responder</h2>
+
+        <form action="/add-responder" method="POST" class="responder-form">
+
+            <div>
+                <label for="name">Responder Name</label>
+                <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    required
+                    maxlength="100"
+                    placeholder="Enter responder name">
+            </div>
+
+            <div>
+                <label for="role">Department / Role</label>
+
+                <select id="role" name="role" required>
+                    <option value="">Select Role</option>
+                    <option value="Ambulance">Ambulance</option>
+                    <option value="Fire">Fire Department</option>
+                    <option value="Police">Police</option>
+                    <option value="Rescue Team">Rescue Team</option>
+                    <option value="Medical Team">Medical Team</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="phone">Phone Number</label>
+
+                <input
+                    type="tel"
+                    id="phone"
+                    name="phone"
+                    maxlength="20"
+                    placeholder="Enter contact number">
+            </div>
+
+            <button type="submit" class="submit-btn">
+                Add Responder
+            </button>
+
+        </form>
+
+    </section>
+
+    <!-- Responder List -->
+    <section class="responder-panel">
+
+        <h2>Registered Responders</h2>
+
+        {% if responders %}
+
+            <div class="responder-grid">
+
+                {% for responder in responders %}
+
+                    <article class="responder-card">
+
+                        <h3>{{ responder.name }}</h3>
+
+                        <p>Role: {{ responder.role }}</p>
+
+                        <p>
+                            Phone:
+                            {{ responder.phone or "Not provided" }}
+                        </p>
+
+                        <span class="availability-badge">
+                            {{ responder.availability }}
+                        </span>
+
+                    </article>
+
+                {% endfor %}
+
+            </div>
+
+        {% else %}
+
+            <p>No responders registered yet.</p>
+
+        {% endif %}
+
+    </section>
+
+    <!-- Assign Incident -->
+    <section class="responder-panel">
+
+        <h2>Assign Responder to Incident</h2>
+
+        {% set available_responders = responders
+            | selectattr("availability", "equalto", "Available")
+            | list %}
+
+        {% if incidents and available_responders %}
+
+            <form action="/assign-responder"
+                  method="POST"
+                  class="assignment-form">
+
+                <div>
+                    <label for="incident_id">Select Incident</label>
+
+                    <select id="incident_id" name="incident_id" required>
+
+                        <option value="">Choose Incident</option>
+
+                        {% for incident in incidents %}
+
+                            {% if incident.status != "Resolved" %}
+
+                                <option value="{{ incident.id }}">
+                                    #{{ incident.id }}
+                                    — {{ incident.emergency_type }}
+                                    — {{ incident.status }}
+                                </option>
+
+                            {% endif %}
+
+                        {% endfor %}
+
+                    </select>
+                </div>
+
+                <div>
+                    <label for="responder_id">Select Available Responder</label>
+
+                    <select id="responder_id" name="responder_id" required>
+
+                        <option value="">Choose Responder</option>
+
+                        {% for responder in available_responders %}
+
+                            <option value="{{ responder.id }}">
+                                {{ responder.name }} — {{ responder.role }}
+                            </option>
+
+                        {% endfor %}
+
+                    </select>
+                </div>
+
+                <button type="submit" class="submit-btn">
+                    Assign Responder
+                </button>
+
+            </form>
+
+        {% else %}
+
+            <p>
+                Register an available responder and create an incident
+                before assigning resources.
+            </p>
+
+        {% endif %}
+
+    </section>
+
+    <!-- Incident Status Management -->
+    <section class="responder-panel">
+
+        <h2>Incident Response Tracking</h2>
+
+        {% if incidents %}
+
+            {% for incident in incidents %}
+
+                <article class="response-incident">
+
+                    <div>
+                        <h3>
+                            #{{ incident.id }}
+                            — {{ incident.emergency_type }}
+                        </h3>
+
+                        <p>{{ incident.description }}</p>
+
+                        <p>
+                            Severity: {{ incident.severity }}
+                            | Priority: {{ incident.priority }}
+                        </p>
+
+                        <p>
+                            Assigned responder:
+                            {{ incident.responder_name or "Not assigned" }}
+                        </p>
+
+                        <p>
+                            Department:
+                            {{ incident.responder_role or "Not assigned" }}
+                        </p>
+
+                        <p>
+                            Current status: <strong>{{ incident.status }}</strong>
+                        </p>
+                    </div>
+
+                    <form action="/update-status"
+                          method="POST"
+                          class="status-form">
+
+                        <input
+                            type="hidden"
+                            name="incident_id"
+                            value="{{ incident.id }}">
+
+                        <label for="status-{{ incident.id }}">
+                            Update Status
+                        </label>
+
+                        <select
+                            id="status-{{ incident.id }}"
+                            name="status"
+                            required>
+
+                            <option value="Pending"
+                                {% if incident.status == "Pending" %}
+                                    selected
+                                {% endif %}>
+                                Pending
+                            </option>
+
+                            <option value="In Progress"
+                                {% if incident.status == "In Progress" %}
+                                    selected
+                                {% endif %}>
+                                In Progress
+                            </option>
+
+                            <option value="Resolved"
+                                {% if incident.status == "Resolved" %}
+                                    selected
+                                {% endif %}>
+                                Resolved
+                            </option>
+
+                        </select>
+
+                        <button type="submit" class="map-view-button">
+                            Update
+                        </button>
+
+                    </form>
+
+                </article>
+
+            {% endfor %}
+
+        {% else %}
+
+            <p>No incidents available.</p>
+
+        {% endif %}
+
+    </section>
+
+    <p class="prototype-note">
+        Prototype only: responder records and assignments are for testing.
+        This application does not contact real emergency services.
+    </p>
+
+</main>
+
+</body>
+</html>

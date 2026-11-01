@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Women Safety | ResQNet AI</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #080b14;
+            color: #f1f5f9;
+            font-family: Arial, sans-serif;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            padding: 18px 5%;
+            background: #101525;
+            border-bottom: 1px solid #29334a;
+        }
+
+        .logo {
+            font-size: 23px;
+            font-weight: bold;
+        }
+
+        .logo span {
+            color: #fb7185;
+        }
+
+        .nav-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .nav-links a {
+            color: #dbeafe;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .nav-links a:hover {
+            color: #fb7185;
+        }
+
+        .container {
+            width: min(1200px, 92%);
+            margin: 35px auto;
+        }
+
+        .hero {
+            padding: 35px;
+            border: 1px solid #492439;
+            border-radius: 20px;
+            background: linear-gradient(135deg, #241026, #101525, #25101b);
+        }
+
+        .tag {
+            color: #fda4af;
+            letter-spacing: 3px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        h1 {
+            font-size: clamp(30px, 5vw, 46px);
+            margin-bottom: 12px;
+        }
+
+        .hero p {
+            color: #cbd5e1;
+            line-height: 1.7;
+        }
+
+        .notice {
+            margin-top: 20px;
+            padding: 14px;
+            background: #33251a;
+            color: #fde68a;
+            border: 1px solid #854d0e;
+            border-radius: 10px;
+            line-height: 1.6;
+        }
+
+        .sos-area {
+            text-align: center;
+            margin: 28px 0;
+            padding: 28px;
+            background: #111827;
+            border: 1px solid #29334a;
+            border-radius: 18px;
+        }
+
+        .sos-button {
+            display: inline-block;
+            background: #dc2626;
+            color: white;
+            border: 3px solid #fca5a5;
+            border-radius: 50%;
+            width: 145px;
+            height: 145px;
+            font-size: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 30px #dc262655;
+        }
+
+        .sos-button:hover {
+            background: #b91c1c;
+        }
+
+        .sos-area p {
+            color: #cbd5e1;
+            line-height: 1.6;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin: 25px 0;
+        }
+
+        .stat {
+            background: #111827;
+            padding: 22px;
+            border: 1px solid #29334a;
+            border-radius: 14px;
+        }
+
+        .stat span {
+            color: #94a3b8;
+        }
+
+        .stat strong {
+            display: block;
+            font-size: 30px;
+            margin-top: 12px;
+            color: #fb7185;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+            gap: 22px;
+            align-items: start;
+        }
+
+        .panel {
+            background: #111827;
+            padding: 24px;
+            border: 1px solid #29334a;
+            border-radius: 16px;
+            margin-bottom: 22px;
+        }
+
+        .panel h2 {
+            margin-top: 0;
+        }
+
+        label {
+            display: block;
+            margin: 15px 0 7px;
+            color: #e2e8f0;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            background: #080b14;
+            color: white;
+            border: 1px solid #475569;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .button {
+            margin-top: 16px;
+            width: 100%;
+            padding: 13px;
+            background: #be123c;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .button:hover {
+            background: #e11d48;
+        }
+
+        .secondary-button {
+            width: 100%;
+            margin-top: 10px;
+            padding: 11px;
+            border: 1px solid #64748b;
+            border-radius: 8px;
+            color: white;
+            background: #1e293b;
+            cursor: pointer;
+        }
+
+        .contact {
+            padding: 14px 0;
+            border-bottom: 1px solid #29334a;
+        }
+
+        .contact strong {
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .contact a {
+            color: #fda4af;
+            text-decoration: none;
+        }
+
+        .tips li {
+            margin-bottom: 12px;
+            color: #cbd5e1;
+            line-height: 1.6;
+        }
+
+        .flash {
+            padding: 13px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            background: #123326;
+            border: 1px solid #166534;
+            color: #bbf7d0;
+        }
+
+        .flash.error {
+            background: #3b111b;
+            border-color: #9f1239;
+            color: #fecdd3;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 650px;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 13px;
+            border-bottom: 1px solid #29334a;
+        }
+
+        th {
+            color: #fda4af;
+        }
+
+        td {
+            color: #cbd5e1;
+        }
+
+        .status-form {
+            display: flex;
+            gap: 8px;
+            min-width: 210px;
+        }
+
+        .status-form select {
+            min-width: 120px;
+        }
+
+        .status-form button {
+            background: #334155;
+            color: white;
+            border: 0;
+            padding: 8px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        footer {
+            text-align: center;
+            padding: 25px;
+            color: #94a3b8;
+        }
+
+        @media (max-width: 600px) {
+            nav {
+                align-items: flex-start;
+            }
+
+            .hero {
+                padding: 23px;
+            }
+
+            .sos-button {
+                width: 125px;
+                height: 125px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<nav>
+    <div class="logo">ResQNet <span>AI</span></div>
+
+    <div class="nav-links">
+        <a href="/">Home</a>
+        <a href="/report">Report Emergency</a>
+        <a href="/dashboard">Command Center</a>
+        <a href="/map">Emergency Map</a>
+        <a href="/responders">Responders</a>
+        <a href="/analytics">Analytics</a>
+    </div>
+</nav>
+
+<main class="container">
+
+    <section class="hero">
+        <p class="tag">PERSONAL SAFETY & EMERGENCY SUPPORT</p>
+
+        <h1>Women Safety Center</h1>
+
+        <p>
+            Report unsafe situations, record emergency details,
+            access helpline options and keep track of safety reports
+            through the ResQNet AI prototype.
+        </p>
+
+        <div class="notice">
+            <strong>Important:</strong>
+            This is a prototype, not a monitored emergency dispatch service.
+            Submitting an SOS does not contact police or share your location
+            automatically. If you are in immediate danger in India, call
+            112 when it is safe to do so.
+        </div>
+    </section>
+
+    <section class="sos-area">
+        <h2>Emergency SOS</h2>
+
+        <button type="button" class="sos-button" id="sosButton">
+            SOS
+        </button>
+
+        <p>
+            Press SOS to prepare a report. You must confirm before
+            it is saved. This does not send an alert to authorities.
+        </p>
+
+        <p id="locationStatus" aria-live="polite">
+            Location has not been collected.
+        </p>
+
+        <button type="button" class="secondary-button" id="locationButton">
+            Get My Current Location
+        </button>
+    </section>
+
+<!-- LIVE RESCUE ETA -->
+<section class="panel" id="rescueEtaPanel">
+    <h2>🚑 Live Rescue ETA</h2>
+
+    <p id="rescueStatus">
+        No responder location is available yet.
+    </p>
+
+    <div class="stats">
+        <article class="stat">
+            <span>Estimated Arrival</span>
+            <strong id="rescueEta">--</strong>
+            <span>minutes</span>
+        </article>
+
+        <article class="stat">
+            <span>Road Distance</span>
+            <strong id="rescueDistance">--</strong>
+            <span>kilometres</span>
+        </article>
+    </div>
+
+    <p class="notice">
+        ETA is an estimate, not a confirmed rescue time.
+        This prototype does not dispatch responders or automatically
+        contact emergency services.
+    </p>
+
+    <button
+        type="button"
+        class="secondary-button"
+        id="checkEtaButton">
+        Check Rescue ETA
+    </button>
+
+    <p id="etaMessage" aria-live="polite"></p>
+</section>
+
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="flash {% if category == 'error' %}error{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <section class="stats">
+        <article class="stat">
+            <span>Total Safety Reports</span>
+            <strong>{{ stats.total }}</strong>
+        </article>
+
+        <article class="stat">
+            <span>Pending Reports</span>
+            <strong>{{ stats.pending }}</strong>
+        </article>
+
+        <article class="stat">
+            <span>Resolved Reports</span>
+            <strong>{{ stats.resolved }}</strong>
+        </article>
+    </section>
+
+    <section class="grid">
+
+        <article class="panel" id="reportForm">
+            <h2>📝 Report a Safety Incident</h2>
+
+            <form action="{{ url_for('submit_women_safety_report') }}"
+                  method="POST"
+                  id="safetyForm">
+
+                <label for="incident_type">Incident Type</label>
+
+                <select name="incident_type" id="incident_type" required>
+                    <option value="">Select incident type</option>
+                    <option value="Harassment">Harassment</option>
+                    <option value="Stalking">Stalking</option>
+                    <option value="Unsafe Location">Unsafe Location</option>
+                    <option value="Threat">Threat</option>
+                    <option value="Transport Safety">Transport Safety</option>
+                    <option value="Other">Other</option>
+                    <option value="SOS Emergency">SOS Emergency</option>
+                </select>
+
+                <label for="description">Incident Details</label>
+
+                <textarea
+                    name="description"
+                    id="description"
+                    placeholder="Describe the situation. Do not include unnecessary sensitive details."
+                ></textarea>
+
+                <label for="contact_name">Trusted Contact Name (Optional)</label>
+
+                <input
+                    type="text"
+                    name="contact_name"
+                    id="contact_name"
+                    maxlength="100"
+                    placeholder="Trusted contact name"
+                >
+
+                <label for="contact_phone">Trusted Contact Phone (Optional)</label>
+
+                <input
+                    type="tel"
+                    name="contact_phone"
+                    id="contact_phone"
+                    maxlength="20"
+                    placeholder="Trusted contact number"
+                >
+
+                <input type="hidden" name="latitude" id="latitude">
+                <input type="hidden" name="longitude" id="longitude">
+
+                <button class="button" type="submit">
+                    Submit Safety Report
+                </button>
+            </form>
+        </article>
+
+        <div>
+
+            <article class="panel">
+                <h2>📞 Emergency Helplines</h2>
+
+                <div class="contact">
+                    <strong>India Emergency Response</strong>
+                    <a href="tel:112">Call 112</a>
+                    <p>For immediate emergencies, when it is safe to call.</p>
+                </div>
+
+                <div class="contact">
+                    <strong>Women Helpline</strong>
+                    <a href="tel:181">Call 181</a>
+                    <p>Availability and services can vary by state.</p>
+                </div>
+
+                <div class="contact">
+                    <strong>National Commission for Women</strong>
+                    <p>
+                        Check current complaint options and contact
+                        details on the official website.
+                    </p>
+                    <a href="https://www.ncw.gov.in/"
+                       target="_blank"
+                       rel="noopener noreferrer">
+                        Official NCW Website
+                    </a>
+                </div>
+
+                <p>
+                    Helpline information may change. If a number does not
+                    work, use verified local emergency information.
+                </p>
+            </article>
+
+            <article class="panel">
+                <h2>🛡️ Personal Safety Tips</h2>
+
+                <ul class="tips">
+                    <li>Share your trip details with someone you trust when appropriate.</li>
+                    <li>Use well-lit, populated routes whenever possible.</li>
+                    <li>Keep your phone charged and emergency contacts accessible.</li>
+                    <li>If threatened, move toward a safer public place if possible.</li>
+                    <li>Do not rely on this prototype to alert anyone automatically.</li>
+                    <li>If in immediate danger, contact emergency services when safe.</li>
+                </ul>
+            </article>
+
+        </div>
+    </section>
+
+    <section class="panel">
+        <h2>📊 Recent Women Safety Reports</h2>
+
+        {% if reports %}
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Incident Type</th>
+                        <th>Priority</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                        <th>Update Status</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for report in reports %}
+                    <tr>
+                        <td>#{{ report.id }}</td>
+                        <td>{{ report.incident_type }}</td>
+                        <td>{{ report.priority }}</td>
+                        <td>{{ report.status }}</td>
+
+                        <td>
+                            {% if report.created_at %}
+                                {{ report.created_at.strftime("%d-%m-%Y %H:%M") }}
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            <form class="status-form"
+                                  action="{{ url_for('update_women_safety_status') }}"
+                                  method="POST">
+
+                                <input type="hidden"
+                                       name="report_id"
+                                       value="{{ report.id }}">
+
+                                <select name="status" aria-label="Report status">
+                                    <option value="Pending"
+                                        {% if report.status == 'Pending' %}selected{% endif %}>
+                                        Pending
+                                    </option>
+
+                                    <option value="In Progress"
+                                        {% if report.status == 'In Progress' %}selected{% endif %}>
+                                        In Progress
+                                    </option>
+
+                                    <option value="Resolved"
+                                        {% if report.status == 'Resolved' %}selected{% endif %}>
+                                        Resolved
+                                    </option>
+                                </select>
+
+                                <button type="submit">Save</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+            <p>No safety reports have been submitted yet.</p>
+        {% endif %}
+    </section>
+
+</main>
+
+<footer>
+    ResQNet AI | Emergency Response & Women Safety Prototype
+</footer>
+
+<script>
+    const locationStatus = document.getElementById("locationStatus");
+    const locationButton = document.getElementById("locationButton");
+    const safetyForm = document.getElementById("safetyForm");
+    const incidentType = document.getElementById("incident_type");
+
+    function getLocation() {
+        if (!navigator.geolocation) {
+            locationStatus.textContent =
+                "Geolocation is not supported by this browser.";
+            return;
+        }
+
+        locationStatus.textContent = "Requesting location permission...";
+
+        navigator.geolocation.getCurrentPosition(
+            function (position) {
+                const lat = position.coords.latitude;
+                const lng = position.coords.longitude;
+
+                document.getElementById("latitude").value = lat;
+                document.getElementById("longitude").value = lng;
+
+                locationStatus.textContent =
+                    "Location captured: " +
+                    lat.toFixed(5) + ", " + lng.toFixed(5) +
+                    ". It will be included if you submit the report.";
+            },
+            function () {
+                locationStatus.textContent =
+                    "Location not available. You can still submit a report.";
+            },
+            {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 0
+            }
+        );
+    }
+
+    locationButton.addEventListener("click", getLocation);
+
+    document.getElementById("sosButton").addEventListener("click", function () {
+        incidentType.value = "SOS Emergency";
+
+        document.getElementById("description").value =
+            "SOS report created by the user. Please enter any relevant details.";
+
+        document.getElementById("reportForm").scrollIntoView({
+            behavior: "smooth"
+        });
+
+        document.getElementById("description").focus();
+
+        if (confirm(
+            "This prototype does not contact police or emergency services. " +
+            "Would you like to prepare an SOS report for saving?"
+        )) {
+            getLocation();
+        }
+    });
+
+    safetyForm.addEventListener("submit", function (event) {
+        const confirmed = confirm(
+            "Submit this safety report to the ResQNet prototype database? " +
+            "It will not automatically alert emergency services."
+        );
+
+        if (!confirmed) {
+            event.preventDefault();
+        }
+    });
+// Rescue ETA button
+document.getElementById("checkEtaButton").addEventListener("click", async function () {
+    const etaMessage = document.getElementById("etaMessage");
+    const rescueStatus = document.getElementById("rescueStatus");
+    const etaDisplay = document.getElementById("rescueEta");
+    const distanceDisplay = document.getElementById("rescueDistance");
+
+    etaMessage.textContent = "";
+    etaDisplay.textContent = "--";
+    distanceDisplay.textContent = "--";
+
+    const userLat = document.getElementById("latitude").value;
+    const userLon = document.getElementById("longitude").value;
+
+    if (!userLat || !userLon) {
+        etaMessage.textContent = "Please click 'Get My Current Location' first.";
+        return;
+    }
+
+    const responderLat = prompt("Enter the assigned responder's latitude:");
+    const responderLon = prompt("Enter the assigned responder's longitude:");
+
+    if (responderLat === null || responderLon === null ||
+        responderLat.trim() === "" || responderLon.trim() === "") {
+        etaMessage.textContent = "Responder location was not provided. ETA unavailable.";
+        return;
+    }
+
+    const lat = Number(responderLat);
+    const lon = Number(responderLon);
+
+    if (!Number.isFinite(lat) || !Number.isFinite(lon) ||
+        lat < -90 || lat > 90 || lon < -180 || lon > 180) {
+        etaMessage.textContent = "Please enter valid GPS coordinates.";
+        return;
+    }
+
+    rescueStatus.textContent = "Calculating route...";
+
+    try {
+        const response = await fetch("/api/rescue-eta", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                user_lat: Number(userLat),
+                user_lon: Number(userLon),
+                responder_lat: lat,
+                responder_lon: lon
+            })
+        });
+
+        const result = await response.json();
+
+        if (!response.ok || !result.success) {
+            rescueStatus.textContent = "Responder route is unavailable.";
+            etaMessage.textContent = result.message || "Could not calculate ETA.";
+            return;
+        }
+
+        etaDisplay.textContent = result.eta_minutes;
+        distanceDisplay.textContent =
+            result.distance_km !== undefined ? result.distance_km : "--";
+
+        rescueStatus.textContent =
+            "Route estimate calculated. Responder arrival is not confirmed.";
+
+        etaMessage.textContent =
+            "Estimated travel time only; actual arrival may differ.";
+
+    } catch (error) {
+        rescueStatus.textContent = "ETA service is unavailable.";
+        etaMessage.textContent = "Check your connection and Flask server.";
+    }
+});
+
+
+  
+  
+</script>
+
+</body>
+</html>

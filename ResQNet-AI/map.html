@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Emergency Map | ResQNet AI</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <link rel="stylesheet"
+          href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav>
+        <div class="logo">
+            ResQNet <span>AI</span>
+        </div>
+
+        <div class="nav-links">
+            <a href="/">Home</a>
+            <a href="/report">Report Emergency</a>
+            <a href="/dashboard">Command Center</a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="map-page">
+
+        <header class="map-header">
+            <div>
+                <p class="tag">EMERGENCY MONITORING SYSTEM</p>
+
+                <h1>Emergency Map</h1>
+
+                <p>
+                    Monitor submitted emergency reports
+                    with available location coordinates.
+                </p>
+            </div>
+
+            <a href="/dashboard" class="btn secondary">
+                Back to Dashboard
+            </a>
+        </header>
+
+        <!-- Notice -->
+        <div class="map-notice">
+            <strong>Important:</strong>
+            Map markers show reported locations. Incident details
+            and locations must be verified before response decisions.
+        </div>
+
+        <!-- Statistics -->
+        <section class="map-summary">
+
+            <div class="stat-card">
+                <h3>Total Reports</h3>
+                <strong>{{ total_reports }}</strong>
+            </div>
+
+            <div class="stat-card">
+                <h3>Mapped Incidents</h3>
+                <strong>{{ incidents|length }}</strong>
+            </div>
+
+        </section>
+
+        <!-- Map -->
+        <div id="emergencyMap"></div>
+
+        <!-- Legend -->
+        <div class="map-legend">
+
+            <span>
+                <i class="legend-dot critical"></i>
+                Critical
+            </span>
+
+            <span>
+                <i class="legend-dot high"></i>
+                High
+            </span>
+
+            <span>
+                <i class="legend-dot medium"></i>
+                Medium
+            </span>
+
+            <span>
+                <i class="legend-dot other"></i>
+                Other
+            </span>
+
+        </div>
+
+        <!-- Incident List -->
+        <section class="mapped-reports">
+
+            <h2>Incident Details</h2>
+
+            {% if incidents %}
+
+                {% for incident in incidents %}
+
+                    <article class="mapped-report">
+
+                        <div class="mapped-report-content">
+
+                            <h3>
+                                Emergency: {{ incident.type }}
+                                — #{{ incident.id }}
+                            </h3>
+
+                            <p>
+                                {{ incident.description }}
+                            </p>
+
+                            <p>
+                                <strong>Severity:</strong>
+                                {{ incident.severity }}
+                            </p>
+
+                            <p>
+                                <strong>Priority:</strong>
+                                {{ incident.priority }}
+                            </p>
+
+                            <p>
+                                <strong>Status:</strong>
+                                {{ incident.status }}
+                            </p>
+
+                            <small>
+                                Latitude: {{ incident.latitude }},
+                                Longitude: {{ incident.longitude }}
+                            </small>
+
+                        </div>
+
+                        <button
+                            type="button"
+                            class="map-view-button"
+                            data-lat="{{ incident.latitude }}"
+                            data-lng="{{ incident.longitude }}"
+                            data-id="{{ incident.id }}">
+
+                            View on Map
+
+                        </button>
+
+                    </article>
+
+                {% endfor %}
+
+            {% else %}
+
+                <div class="empty-state">
+
+                    <h3>No Mapped Incidents</h3>
+
+                    <p>
+                        No reports with location coordinates were found.
+                    </p>
+
+                    <a href="/report" class="btn emergency">
+                        Report Emergency
+                    </a>
+
+                </div>
+
+            {% endif %}
+
+        </section>
+
+    </main>
+
+    <!-- Leaflet Map Library -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <!-- Incident Data from Flask -->
+    <script id="incident-data" type="application/json">{{ incidents|tojson }}</script>
+
+    <script>
+
+        // Read incident data safely from Flask
+        const dataElement = document.getElementById("incident-data");
+
+        const incidents = JSON.parse(dataElement.textContent);
+
+        // Initialize map centered on India
+        const map = L.map("emergencyMap").setView(
+            [22.9734, 78.6569],
+            5
+        );
+
+        // Load OpenStreetMap tiles
+        L.tileLayer(
+            "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+            {
+                maxZoom: 19,
+                attribution: "&copy; OpenStreetMap contributors"
+            }
+        ).addTo(map);
+
+        // Store markers using incident IDs
+        const markers = {};
+
+        // Select marker color based on severity
+        function getMarkerColor(severity) {
+
+            const level = String(severity || "").toLowerCase();
+
+            if (level === "critical") {
+                return "#ff304f";
+            }
+
+            if (level === "high") {
+                return "#ff922b";
+            }
+
+            if (level === "medium") {
+                return "#ffd43b";
+            }
+
+            return "#4dabf7";
+        }
+
+        // Create markers for incidents
+        incidents.forEach(function(incident) {
+
+            const latitude = Number(incident.latitude);
+
+            const longitude = Number(incident.longitude);
+
+            // Skip invalid coordinates
+            if (
+                !Number.isFinite(latitude) ||
+                !Number.isFinite(longitude) ||
+                latitude < -90 ||
+                latitude > 90 ||
+                longitude < -180 ||
+                longitude > 180
+            ) {
+                return;
+            }
+
+            const marker = L.circleMarker(
+                [latitude, longitude],
+                {
+                    radius: 9,
+                    color: "#ffffff",
+                    weight: 2,
+                    fillColor: getMarkerColor(incident.severity),
+                    fillOpacity: 0.9
+                }
+            ).addTo(map);
+
+            // Add popup information
+            const popup = document.createElement("div");
+
+            const title = document.createElement("strong");
+            title.textContent = incident.type || "Emergency";
+
+            const idLine = document.createElement("p");
+            idLine.textContent = "Incident ID: #" + incident.id;
+
+            const severityLine = document.createElement("p");
+            severityLine.textContent =
+                "Severity: " + (incident.severity || "Unknown");
+
+            const priorityLine = document.createElement("p");
+            priorityLine.textContent =
+                "Priority: " + (incident.priority || "Unknown");
+
+            const statusLine = document.createElement("p");
+            statusLine.textContent =
+                "Status: " + (incident.status || "Unknown");
+
+            popup.appendChild(title);
+            popup.appendChild(idLine);
+            popup.appendChild(severityLine);
+            popup.appendChild(priorityLine);
+            popup.appendChild(statusLine);
+
+            marker.bindPopup(popup);
+
+            marker.bindTooltip(
+                "Incident #" + incident.id
+            );
+
+            markers[String(incident.id)] = marker;
+
+        });
+
+        // Focus map on a selected incident
+        function focusIncident(latitude, longitude, incidentId) {
+
+            const lat = Number(latitude);
+
+            const lng = Number(longitude);
+
+            if (
+                !Number.isFinite(lat) ||
+                !Number.isFinite(lng)
+            ) {
+                alert("This incident has invalid coordinates.");
+                return;
+            }
+
+            map.setView([lat, lng], 15);
+
+            const marker = markers[String(incidentId)];
+
+            if (marker) {
+                marker.openPopup();
+            }
+        }
+
+        // Attach click events to View on Map buttons
+        document.querySelectorAll(".map-view-button").forEach(
+            function(button) {
+
+                button.addEventListener("click", function() {
+
+                    const latitude = button.dataset.lat;
+
+                    const longitude = button.dataset.lng;
+
+                    const incidentId = button.dataset.id;
+
+                    focusIncident(
+                        latitude,
+                        longitude,
+                        incidentId
+                    );
+
+                });
+
+            }
+        );
+
+        // Automatically zoom to available markers
+        const markerList = Object.values(markers);
+
+        if (markerList.length === 1) {
+
+            const marker = markerList[0];
+
+            map.setView(marker.getLatLng(), 14);
+
+        } else if (markerList.length > 1) {
+
+            const group = L.featureGroup(markerList);
+
+            map.fitBounds(
+                group.getBounds(),
+                {
+                    padding: [30, 30],
+                    maxZoom: 14
+                }
+            );
+
+        }
+
+    </script>
+
+</body>
+
+</html>

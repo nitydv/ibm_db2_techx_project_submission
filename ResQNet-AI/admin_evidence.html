@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Evidence Review | ResQNet AI</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+        body {
+            background: #080d18;
+            color: #f8fafc;
+        }
+
+        .review-container {
+            max-width: 1200px;
+            margin: 35px auto;
+            padding: 20px;
+        }
+
+        .evidence-card {
+            background: #111827;
+            border: 1px solid #293548;
+            border-radius: 12px;
+            padding: 22px;
+            margin: 20px 0;
+            overflow-wrap: anywhere;
+        }
+
+        .evidence-card h2 {
+            margin-top: 0;
+        }
+
+        .evidence-meta {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .evidence-field {
+            padding: 12px;
+            background: #0b1220;
+            border-radius: 8px;
+        }
+
+        .evidence-field strong {
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .evidence-card input,
+        .evidence-card select,
+        .evidence-card textarea {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 10px;
+            margin: 8px 0;
+        }
+
+        .evidence-card textarea {
+            min-height: 90px;
+        }
+
+        .review-button {
+            background: #dc2626;
+            color: white;
+            border: none;
+            padding: 12px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .video-link {
+            display: inline-block;
+            margin: 15px 0;
+        }
+
+        @media (max-width: 650px) {
+            .evidence-meta {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<nav>
+    <div class="logo">ResQNet <span>AI</span></div>
+
+    <div class="nav-links">
+        <a href="/dashboard">Command Center</a>
+        <a href="/admin/evidence">Evidence Review</a>
+    </div>
+</nav>
+
+
+<main class="review-container">
+
+    <p class="tag">AUTHORIZED ADMIN AREA</p>
+
+    <h1>🎥 Evidence Review Center</h1>
+
+    <p>
+        Review submitted evidence and update the report status.
+    </p>
+
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+
+        {% if messages %}
+
+            {% for category, message in messages %}
+
+                <p class="flash-message {{ category }}">
+                    {{ message }}
+                </p>
+
+            {% endfor %}
+
+        {% endif %}
+
+    {% endwith %}
+
+
+    {% if reports %}
+
+        {% for report in reports %}
+
+        <article class="evidence-card">
+
+            <h2>
+                Evidence #{{ report.id }} —
+                {{ report.incident_type }}
+            </h2>
+
+            <p>
+                <strong>Status:</strong>
+                {{ report.status }}
+            </p>
+
+            <p>
+                <strong>Description:</strong><br>
+                {{ report.description }}
+            </p>
+
+
+            <div class="evidence-meta">
+
+                <div class="evidence-field">
+                    <strong>Reported Date</strong>
+
+                    {{ report.created_at or 'Not available' }}
+                </div>
+
+                <div class="evidence-field">
+                    <strong>Incident Date</strong>
+
+                    {{ report.incident_datetime or 'Not provided' }}
+                </div>
+
+                <div class="evidence-field">
+                    <strong>Location</strong>
+
+                    {% if report.latitude is not none
+                          and report.longitude is not none %}
+
+                        {{ report.latitude }},
+                        {{ report.longitude }}
+
+                    {% else %}
+
+                        Location not provided
+
+                    {% endif %}
+                </div>
+
+                <div class="evidence-field">
+                    <strong>Contact</strong>
+
+                    {{ report.contact_name or 'Not provided' }}<br>
+
+                    {{ report.contact_phone or 'Not provided' }}
+                </div>
+
+                <div class="evidence-field">
+                    <strong>Original Filename</strong>
+
+                    {{ report.original_filename }}
+                </div>
+
+                <div class="evidence-field">
+                    <strong>Video Size</strong>
+
+                    {{ (report.video_size / 1048576)|round(2) }} MB
+                </div>
+
+            </div>
+
+
+            <a
+                class="video-link"
+                href="{{ url_for(
+                    'view_evidence_video',
+                    evidence_id=report.id
+                ) }}"
+                target="_blank"
+                rel="noopener">
+
+                ▶ Open Evidence Video
+
+            </a>
+
+
+            <form
+                method="POST"
+                action="{{ url_for(
+                    'update_evidence_status',
+                    evidence_id=report.id
+                ) }}">
+
+                <label for="status-{{ report.id }}">
+                    Review Status
+                </label>
+
+                <select
+                    name="status"
+                    id="status-{{ report.id }}"
+                    required>
+
+                    {% for status_option in [
+                        'Submitted',
+                        'Under Review',
+                        'Verified',
+                        'Unverified',
+                        'Closed'
+                    ] %}
+
+                        <option
+                            value="{{ status_option }}"
+                            {% if report.status == status_option %}
+                                selected
+                            {% endif %}>
+
+                            {{ status_option }}
+
+                        </option>
+
+                    {% endfor %}
+
+                </select>
+
+
+                <label for="notes-{{ report.id }}">
+                    Admin Review Notes
+                </label>
+
+                <textarea
+                    name="admin_notes"
+                    id="notes-{{ report.id }}"
+                    maxlength="5000"
+                    placeholder="Record review notes...">{{ report.admin_notes or '' }}</textarea>
+
+
+                <button
+                    type="submit"
+                    class="review-button">
+
+                    Update Review Status
+
+                </button>
+
+            </form>
+
+        </article>
+
+        {% endfor %}
+
+    {% else %}
+
+        <div class="evidence-card">
+            <h2>No evidence reports yet</h2>
+
+            <p>
+                New evidence submissions will appear here.
+            </p>
+        </div>
+
+    {% endif %}
+
+</main>
+
+</body>
+</html>

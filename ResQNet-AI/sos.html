@@ -1,0 +1,348 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>ResQNet AI | Emergency SOS</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+        .sos-container {
+            max-width: 720px;
+            margin: 40px auto;
+            padding: 25px;
+            background: #101525;
+            color: #fff;
+            border: 1px solid #29334b;
+            border-radius: 18px;
+        }
+
+        .sos-heading {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .sos-heading h1 {
+            color: #ff5268;
+            margin-bottom: 8px;
+        }
+
+        .sos-form label {
+            display: block;
+            margin: 18px 0 8px;
+            font-weight: bold;
+        }
+
+        .sos-form input,
+        .sos-form textarea,
+        .sos-form select {
+            box-sizing: border-box;
+            width: 100%;
+            padding: 13px;
+            color: #fff;
+            background: #080d18;
+            border: 1px solid #303b52;
+            border-radius: 8px;
+        }
+
+        .sos-button {
+            display: block;
+            width: 100%;
+            padding: 18px;
+            margin-top: 22px;
+            border: none;
+            border-radius: 10px;
+            background: #e52342;
+            color: white;
+            font-size: 21px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .sos-button:disabled {
+            opacity: 0.6;
+            cursor: wait;
+        }
+
+        .location-button {
+            margin-top: 12px;
+            padding: 12px;
+            background: #253653;
+            color: white;
+            border: 1px solid #425573;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .sos-message {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 8px;
+            background: #19243a;
+            overflow-wrap: anywhere;
+        }
+
+        .sos-links {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 16px;
+        }
+
+        .sos-links a {
+            color: white;
+            background: #176b49;
+            padding: 12px;
+            border-radius: 8px;
+            text-decoration: none;
+        }
+
+        .safety-note {
+            color: #c5ccda;
+            line-height: 1.6;
+            font-size: 14px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+<nav>
+    <div class="logo">ResQNet <span>AI</span></div>
+
+    <div class="nav-links">
+        <a href="/">Home</a>
+        <a href="/dashboard">Command Center</a>
+        <a href="/women-safety">Women Safety</a>
+        <a href="/sos">Emergency SOS</a>
+    </div>
+</nav>
+
+<main class="sos-container">
+
+    <div class="sos-heading">
+        <h1>🆘 Women Safety SOS</h1>
+        <p>Request help and share your current location.</p>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="sos-message">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <form id="sosForm" class="sos-form" method="POST" action="/sos">
+
+        <label for="emergency_type">Emergency Type</label>
+
+        <select id="emergency_type" name="emergency_type" required>
+            <option value="Personal Emergency">Personal Emergency</option>
+            <option value="Harassment">Harassment</option>
+            <option value="Unsafe Situation">Unsafe Situation</option>
+            <option value="Medical Emergency">Medical Emergency</option>
+            <option value="Other Emergency">Other Emergency</option>
+        </select>
+
+        <label for="description">Emergency Details (optional)</label>
+
+        <textarea id="description"
+                  name="description"
+                  rows="3"
+                  placeholder="Briefly describe the situation"></textarea>
+
+        <label for="contact_name">Emergency Contact Name</label>
+
+        <input id="contact_name"
+               name="contact_name"
+               type="text"
+               maxlength="100"
+               placeholder="Contact person's name">
+
+        <label for="contact_phone">
+            Emergency Contact Mobile Number
+        </label>
+
+        <input id="contact_phone"
+               name="contact_phone"
+               type="tel"
+               maxlength="20"
+               placeholder="Include country code, e.g. +91..."
+               required>
+
+        <label>Current Location</label>
+
+        <input id="latitude"
+               name="latitude"
+               type="hidden">
+
+        <input id="longitude"
+               name="longitude"
+               type="hidden">
+
+        <button type="button"
+                id="locationBtn"
+                class="location-button">
+            📍 Get My Current Location
+        </button>
+
+        <div id="locationMessage"
+             class="sos-message"
+             role="status">
+            Location has not been obtained yet.
+        </div>
+
+        <button id="sosButton"
+                type="submit"
+                class="sos-button">
+            🆘 SAVE SOS REPORT
+        </button>
+
+    </form>
+
+    <div id="shareOptions" hidden>
+        <h3>Share Your Emergency Location</h3>
+
+        <p>
+            After the report is saved, use one of these options to
+            share the emergency details with your contact.
+        </p>
+
+        <div class="sos-links">
+            <a id="whatsappLink"
+               href="#"
+               target="_blank"
+               rel="noopener">
+                Share via WhatsApp
+            </a>
+
+            <a id="smsLink" href="#">
+                Open SMS
+            </a>
+
+            <a id="mapLink"
+               href="#"
+               target="_blank"
+               rel="noopener">
+                View Location on Map
+            </a>
+        </div>
+    </div>
+
+    <p class="safety-note">
+        Privacy and safety: Your location is requested only after you
+        press the location button. Saving this report does not itself
+        send an SMS, contact police, or guarantee emergency assistance.
+        For immediate danger in India, call 112 directly.
+    </p>
+
+</main>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const form = document.getElementById("sosForm");
+    const locationBtn = document.getElementById("locationBtn");
+    const locationMessage = document.getElementById("locationMessage");
+    const sosButton = document.getElementById("sosButton");
+
+    let locationObtained = false;
+
+    locationBtn.addEventListener("click", function () {
+
+        if (!navigator.geolocation) {
+            locationMessage.textContent =
+                "This browser does not support location services.";
+            return;
+        }
+
+        locationMessage.textContent =
+            "Requesting location permission...";
+
+        locationBtn.disabled = true;
+
+        navigator.geolocation.getCurrentPosition(
+            function (position) {
+
+                document.getElementById("latitude").value =
+                    position.coords.latitude.toFixed(7);
+
+                document.getElementById("longitude").value =
+                    position.coords.longitude.toFixed(7);
+
+                locationObtained = true;
+
+                locationMessage.textContent =
+                    "Location obtained successfully.";
+
+                locationBtn.disabled = false;
+            },
+
+            function (error) {
+
+                locationObtained = false;
+
+                const messages = {
+                    1: "Location permission denied. Allow location in your browser settings.",
+                    2: "Current location is unavailable. Try again.",
+                    3: "Location request timed out. Try again."
+                };
+
+                locationMessage.textContent =
+                    messages[error.code] ||
+                    "Unable to obtain location.";
+
+                locationBtn.disabled = false;
+            },
+
+            {
+                enableHighAccuracy: true,
+                timeout: 15000,
+                maximumAge: 0
+            }
+        );
+    });
+
+    form.addEventListener("submit", function (event) {
+
+        if (!locationObtained) {
+            event.preventDefault();
+
+            locationMessage.textContent =
+                "Please obtain your location before submitting the SOS report.";
+
+            return;
+        }
+
+        const phone =
+            document.getElementById("contact_phone").value.trim();
+
+        if (!phone) {
+            event.preventDefault();
+            alert("Please enter an emergency contact number.");
+            return;
+        }
+
+        /*
+         * The Flask server saves the report.
+         * Sharing options are prepared after successful submission
+         * in the separate confirmation step.
+         */
+        sosButton.disabled = true;
+        sosButton.textContent = "Saving SOS Report...";
+    });
+
+});
+</script>
+
+</body>
+</html>
+```

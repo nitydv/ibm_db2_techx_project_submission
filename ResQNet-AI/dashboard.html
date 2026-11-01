@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>ResQNet AI | Command Center</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<!-- NAVIGATION -->
+<nav>
+    <div class="logo">ResQNet <span>AI</span></div>
+
+    <div class="nav-links">
+        <a href="/">Home</a>
+        <a href="/report">Report Emergency</a>
+        <a href="/responders">Responder Management</a>
+        <a href="/analytics">Analytics</a>
+        <a href="{{ url_for('women_safety') }}">Women Safety</a>
+        <a href="{{ url_for('women_safety_map') }}">Women Safety Map</a>
+        
+</a>
+        <a href="/dashboard">Command Center</a>
+        
+</a>
+        <a href="/map">Emergency Map</a>
+    </div>
+</nav>
+
+
+<!-- MAIN DASHBOARD -->
+<main class="dashboard">
+
+    <!-- PAGE HEADING -->
+    <div class="dashboard-heading">
+
+        <div>
+            <p class="tag">EMERGENCY OPERATIONS</p>
+
+            <h1>Command Center</h1>
+
+            <p>Incident monitoring and preliminary AI assessment</p>
+        </div>
+
+        <div class="dashboard-actions">
+
+            <a href="/report" class="btn emergency">
+                + New Report
+            </a>
+
+            <a href="/map" class="btn secondary">
+                📍 Open Emergency Map
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- SAFETY NOTICE -->
+    <div class="notice">
+        <strong>Important:</strong>
+        AI assessments are preliminary suggestions, not verified dispatch
+        decisions. Emergency responders must verify reports and resource needs.
+    </div>
+
+
+    <!-- FLASH MESSAGES -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+
+        {% if messages %}
+
+            {% for category, message in messages %}
+
+                <div class="flash-message {{ category }}">
+                    {{ message }}
+                </div>
+
+            {% endfor %}
+
+        {% endif %}
+
+    {% endwith %}
+
+
+    <!-- DASHBOARD STATISTICS -->
+    <section class="stats">
+
+        <div class="stat-card">
+            <h3>Total Incidents</h3>
+            <strong>{{ total_incidents }}</strong>
+            <p>All recorded reports</p>
+        </div>
+
+        <div class="stat-card">
+            <h3>Pending</h3>
+            <strong>{{ pending_count }}</strong>
+            <p>Awaiting review</p>
+        </div>
+
+        <div class="stat-card">
+            <h3>Critical</h3>
+            <strong>{{ critical_count }}</strong>
+            <p>AI-assessed critical</p>
+        </div>
+
+        <div class="stat-card">
+            <h3>Priority P1</h3>
+            <strong>{{ high_priority_count }}</strong>
+            <p>Requires urgent review</p>
+        </div>
+
+    </section>
+<!-- COMMUNITY SAFETY: ANONYMOUS CRIME REPORTING -->
+<section class="incident-section community-safety">
+    <div class="section-heading">
+        <div>
+            <p class="tag">COMMUNITY SAFETY</p>
+            <h2>Anonymous Crime Reporter</h2>
+            <p>Share crime-related evidence and safely track a submitted report.</p>
+        </div>
+    </div>
+
+    <div class="community-safety-grid">
+        <article class="feature-card safety-card">
+            <div class="safety-icon" aria-hidden="true">🕵️</div>
+            <h3>Anonymous Crime Reporter</h3>
+            <p>Submit crime-related video evidence without entering personal contact details.</p>
+            <a class="safety-button report-button" href="{{ url_for('anonymous_crime_report') }}">
+                Report Anonymously <span aria-hidden="true">→</span>
+            </a>
+        </article>
+
+        <article class="feature-card safety-card">
+            <div class="safety-icon" aria-hidden="true">🔎</div>
+            <h3>Track Anonymous Report</h3>
+            <p>Check the status of a report using its tracking ID.</p>
+            <a class="safety-button track-button" href="{{ url_for('anonymous_crime_track') }}">
+                Track Report <span aria-hidden="true">→</span>
+            </a>
+        </article>
+    </div>
+</section>
+
+<style>
+    .community-safety-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 22px;
+        margin-top: 22px;
+    }
+
+    .safety-card {
+        padding: 24px;
+        border: 1px solid rgba(255, 255, 255, 0.10);
+        border-radius: 14px;
+        background: rgba(16, 21, 37, 0.72);
+        transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .safety-card:hover {
+        transform: translateY(-4px);
+        border-color: #f04b60;
+    }
+
+    .safety-icon {
+        font-size: 32px;
+        margin-bottom: 12px;
+    }
+
+    .safety-card h3 { margin-bottom: 12px; }
+
+    .safety-card p {
+        line-height: 1.7;
+        margin-bottom: 18px;
+    }
+
+    .safety-button {
+        display: inline-block;
+        padding: 12px 18px;
+        border-radius: 8px;
+        color: #fff;
+        text-decoration: none;
+        font-weight: 600;
+        transition: opacity 0.2s ease;
+    }
+
+    .safety-button:hover { opacity: 0.86; }
+    .report-button { background: #d9364f; }
+    .track-button { background: #245dcc; }
+
+    @media (max-width: 700px) {
+        .community-safety-grid { grid-template-columns: 1fr; }
+    }
+</style>
+
+    <!-- INCIDENT MANAGEMENT -->
+    <section class="incident-section">
+
+        <div class="section-heading">
+
+            <div>
+                <p class="tag">LIVE MONITORING</p>
+                <h2>Incident Reports</h2>
+                <p>Search and filter submitted emergencies.</p>
+            </div>
+
+        </div>
+
+
+        <!-- SEARCH AND FILTER CONTROLS -->
+        <section class="incident-tools">
+
+            <div class="incident-filters">
+
+                <!-- SEARCH -->
+                <input
+                    type="search"
+                    id="incidentSearch"
+                    placeholder="Search ID, emergency type or description..."
+                    aria-label="Search incidents">
+
+                <!-- STATUS FILTER -->
+                <select id="statusFilter" aria-label="Filter by status">
+
+                    <option value="all">All Statuses</option>
+                    <option value="pending">Pending</option>
+                    <option value="in progress">In Progress</option>
+                    <option value="resolved">Resolved</option>
+
+                </select>
+
+                <!-- SEVERITY FILTER -->
+                <select id="severityFilter" aria-label="Filter by severity">
+
+                    <option value="all">All Severities</option>
+                    <option value="critical">Critical</option>
+                    <option value="high">High</option>
+                    <option value="medium">Medium</option>
+                    <option value="low">Low</option>
+                    <option value="not analyzed">Not Analyzed</option>
+
+                </select>
+
+                <!-- PRIORITY FILTER -->
+                <select id="priorityFilter" aria-label="Filter by priority">
+
+                    <option value="all">All Priorities</option>
+                    <option value="p1">P1</option>
+                    <option value="p2">P2</option>
+                    <option value="p3">P3</option>
+
+                </select>
+
+                <!-- RESET BUTTON -->
+                <button
+                    type="button"
+                    id="resetFilters"
+                    class="btn secondary">
+
+                    ↻ Reset Filters
+
+                </button>
+
+            </div>
+
+            <!-- FILTER RESULT COUNT -->
+            <p id="visibleCount" aria-live="polite">
+                {{ incidents|length }} reports
+            </p>
+
+        </section>
+
+
+        <!-- INCIDENT LIST -->
+        <div class="incident-list" id="incidentList">
+
+            {% if incidents %}
+
+                {% for incident in incidents %}
+
+                <article
+                    class="incident-card"
+
+                    data-severity="{{ (incident.severity or 'Not Analyzed')|lower }}"
+
+                    data-priority="{{ (incident.priority or 'P3')|lower }}"
+
+                    data-status="{{ (incident.status or 'Pending')|lower }}">
+
+                    <!-- INCIDENT INFORMATION -->
+                    <div class="incident-info">
+
+                        <div class="incident-title-row">
+
+                            <h3>
+                                🚨 {{ incident.emergency_type }}
+                            </h3>
+
+                            <span class="incident-id">
+                                #{{ incident.id }}
+                            </span>
+
+                        </div>
+
+
+                        <!-- DESCRIPTION -->
+                        <p class="incident-description">
+                            {{ incident.description }}
+                        </p>
+
+
+                        <!-- LOCATION AND TIME -->
+                        <div class="incident-meta">
+
+                            <span>
+
+                                📍
+
+                                {% if incident.latitude is not none
+                                      and incident.longitude is not none %}
+
+                                    {{ incident.latitude }},
+                                    {{ incident.longitude }}
+
+                                {% else %}
+
+                                    Location not provided
+
+                                {% endif %}
+
+                            </span>
+
+                            <span>
+                                🕒 {{ incident.created_at }}
+                            </span>
+
+                        </div>
+
+
+                        <!-- AI ASSESSMENT -->
+                        <div class="ai-panel">
+
+                            <h4>🤖 Preliminary AI Assessment</h4>
+
+                            <p>
+                                <strong>Reason:</strong>
+
+                                {{ incident.ai_reason or
+                                   'No AI assessment stored for this report.' }}
+                            </p>
+
+                            <p>
+                                <strong>Suggested resources:</strong>
+
+                                {{ incident.recommended_resources or
+                                   'Requires manual assessment' }}
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- INCIDENT STATUS AND PRIORITY -->
+                    <aside class="incident-status">
+
+                        <span class="status-badge">
+                            {{ incident.status or 'Pending' }}
+                        </span>
+
+
+                        <div class="assessment-item">
+
+                            <small>SEVERITY</small>
+
+                            <strong class="severity-value">
+                                {{ incident.severity or 'Not Analyzed' }}
+                            </strong>
+
+                        </div>
+
+
+                        <div class="assessment-item">
+
+                            <small>PRIORITY</small>
+
+                            <strong class="priority-value">
+                                {{ incident.priority or 'P3' }}
+                            </strong>
+
+                        </div>
+
+                    </aside>
+
+                </article>
+
+                {% endfor %}
+
+
+                <!-- NO MATCH MESSAGE -->
+                <p id="noResults" class="no-results" hidden>
+                    No incidents match your search or selected filters.
+                </p>
+
+
+            {% else %}
+
+                <!-- EMPTY STATE -->
+                <div class="empty-state">
+
+                    <div class="empty-icon">🚑</div>
+
+                    <h3>No emergency reports yet</h3>
+
+                    <p>Submitted reports will appear here.</p>
+
+                    <a href="/report" class="btn emergency">
+                        Report an Emergency
+                    </a>
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+    </section>
+
+
+    <!-- FOOTER -->
+    <footer class="dashboard-footer">
+        ResQNet AI Prototype · Human verification required
+    </footer>
+
+</main>
+
+
+<!-- SEARCH AND FILTER JAVASCRIPT -->
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const searchInput = document.getElementById("incidentSearch");
+    const statusFilter = document.getElementById("statusFilter");
+    const severityFilter = document.getElementById("severityFilter");
+    const priorityFilter = document.getElementById("priorityFilter");
+    const resetButton = document.getElementById("resetFilters");
+
+    const cards = Array.from(
+        document.querySelectorAll(".incident-card")
+    );
+
+    const noResults = document.getElementById("noResults");
+    const visibleCount = document.getElementById("visibleCount");
+
+
+    // FILTER INCIDENTS
+    function filterIncidents() {
+
+        const query = searchInput.value.toLowerCase().trim();
+
+        const selectedStatus = statusFilter.value.toLowerCase();
+        const selectedSeverity = severityFilter.value.toLowerCase();
+        const selectedPriority = priorityFilter.value.toLowerCase();
+
+        let visible = 0;
+
+
+        cards.forEach(function (card) {
+
+            // Search all text inside the incident card
+            const text = card.innerText.toLowerCase();
+
+            // Read incident attributes
+            const status = card.dataset.status;
+            const severity = card.dataset.severity;
+            const priority = card.dataset.priority;
+
+
+            // Search matching
+            const matchesSearch = text.includes(query);
+
+
+            // Status matching
+            const normalizedStatus = status.replace(/[_-]/g, " ");
+
+            const matchesStatus =
+                selectedStatus === "all" ||
+                normalizedStatus === selectedStatus;
+
+
+            // Severity matching
+            const matchesSeverity =
+                selectedSeverity === "all" ||
+                severity === selectedSeverity;
+
+
+            // Priority matching
+            const matchesPriority =
+                selectedPriority === "all" ||
+                priority === selectedPriority;
+
+
+            // Show only matching incidents
+            const show =
+                matchesSearch &&
+                matchesStatus &&
+                matchesSeverity &&
+                matchesPriority;
+
+
+            card.hidden = !show;
+
+            if (show) {
+                visible++;
+            }
+
+        });
+
+
+        // Update count
+        if (visibleCount) {
+
+            visibleCount.textContent =
+                "Showing " + visible + " of " + cards.length + " incidents";
+
+        }
+
+
+        // Show or hide no-results message
+        if (noResults) {
+
+            noResults.hidden = visible !== 0;
+
+        }
+
+    }
+
+
+    // RESET ALL FILTERS
+    function resetFilters() {
+
+        searchInput.value = "";
+        statusFilter.value = "all";
+        severityFilter.value = "all";
+        priorityFilter.value = "all";
+
+        filterIncidents();
+
+    }
+
+
+    // EVENT LISTENERS
+    searchInput.addEventListener("input", filterIncidents);
+
+    statusFilter.addEventListener("change", filterIncidents);
+
+    severityFilter.addEventListener("change", filterIncidents);
+
+    priorityFilter.addEventListener("change", filterIncidents);
+
+    resetButton.addEventListener("click", resetFilters);
+
+
+    // Initial count
+    filterIncidents();
+
+});
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register | ResQNet AI</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+            padding: 20px;
+            background: #080b14;
+            color: #f8fafc;
+            font-family: Arial, sans-serif;
+        }
+
+        .card {
+            width: 100%;
+            max-width: 430px;
+            padding: 32px;
+            background: #111827;
+            border: 1px solid #334155;
+            border-radius: 18px;
+        }
+
+        h1 span {
+            color: #fb7185;
+        }
+
+        p {
+            color: #94a3b8;
+            line-height: 1.6;
+        }
+
+        label {
+            display: block;
+            margin: 16px 0 7px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            color: white;
+            background: #080b14;
+            border: 1px solid #475569;
+            border-radius: 8px;
+        }
+
+        button {
+            width: 100%;
+            margin-top: 22px;
+            padding: 13px;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            background: #be123c;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        a {
+            color: #fda4af;
+        }
+
+        .message {
+            padding: 10px;
+            margin: 8px 0;
+            border-radius: 7px;
+            background: #3b111b;
+        }
+    </style>
+</head>
+
+<body>
+    <main class="card">
+        <h1>ResQNet <span>AI</span></h1>
+        <h2>Create your account</h2>
+
+        <p>Register to access your ResQNet account.</p>
+
+        {% with messages = get_flashed_messages() %}
+            {% for message in messages %}
+                <div class="message">{{ message }}</div>
+            {% endfor %}
+        {% endwith %}
+
+        <form method="POST">
+            <label for="full_name">Full Name</label>
+            <input
+                id="full_name"
+                name="full_name"
+                maxlength="100"
+                autocomplete="name"
+                required
+            >
+
+            <label for="email">Email</label>
+            <input
+                id="email"
+                type="email"
+                name="email"
+                maxlength="150"
+                autocomplete="email"
+                required
+            >
+
+            <label for="password">Password</label>
+            <input
+                id="password"
+                type="password"
+                name="password"
+                minlength="8"
+                autocomplete="new-password"
+                required
+            >
+
+            <label for="confirm_password">Confirm Password</label>
+            <input
+                id="confirm_password"
+                type="password"
+                name="confirm_password"
+                minlength="8"
+                autocomplete="new-password"
+                required
+            >
+
+            <button type="submit">Create Account</button>
+        </form>
+
+        <p>Already registered? <a href="{{ url_for('login') }}">Login</a></p>
+        <p><a href="{{ url_for('home') }}">Back to Home</a></p>
+    </main>
+</body>
+</html>

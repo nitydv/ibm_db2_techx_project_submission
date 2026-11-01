@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Upload Evidence | ResQNet AI</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #080d18;
+            color: #f1f5f9;
+            min-height: 100vh;
+            padding: 25px 15px;
+        }
+
+        .container {
+            max-width: 760px;
+            margin: auto;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .brand {
+            font-size: 23px;
+            font-weight: bold;
+            color: #60a5fa;
+        }
+
+        .back-link {
+            color: #cbd5e1;
+            text-decoration: none;
+            border: 1px solid #334155;
+            padding: 10px 14px;
+            border-radius: 9px;
+        }
+
+        .card {
+            background: #111827;
+            border: 1px solid #263449;
+            border-radius: 18px;
+            padding: 28px;
+            box-shadow: 0 15px 40px #00000030;
+        }
+
+        h1 {
+            font-size: 27px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #9caec5;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        .notice {
+            background: #172554;
+            border: 1px solid #1d4ed8;
+            color: #bfdbfe;
+            padding: 14px;
+            border-radius: 10px;
+            margin-bottom: 22px;
+            line-height: 1.6;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 19px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 13px;
+            border-radius: 9px;
+            border: 1px solid #34445d;
+            background: #0b1220;
+            color: #f8fafc;
+            font-size: 15px;
+            outline: none;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            border-color: #60a5fa;
+        }
+
+        textarea {
+            min-height: 110px;
+            resize: vertical;
+        }
+
+        .hint {
+            color: #94a3b8;
+            font-size: 12px;
+            margin-top: 7px;
+            line-height: 1.5;
+        }
+
+        .file-box {
+            border: 2px dashed #3b82f6;
+            background: #0b1730;
+            border-radius: 12px;
+            padding: 22px;
+            text-align: center;
+        }
+
+        .file-icon {
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+
+        .file-box input {
+            margin-top: 15px;
+            border: none;
+            background: transparent;
+        }
+
+        .file-info {
+            color: #93c5fd;
+            font-size: 13px;
+            margin-top: 10px;
+            overflow-wrap: anywhere;
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .location-btn {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            background: #172554;
+            color: #bfdbfe;
+            border: 1px solid #2563eb;
+            border-radius: 9px;
+            cursor: pointer;
+        }
+
+        .consent {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            background: #0b1220;
+            padding: 14px;
+            border-radius: 10px;
+            border: 1px solid #334155;
+            margin: 22px 0;
+            line-height: 1.5;
+            font-size: 13px;
+        }
+
+        .consent input {
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background: #dc2626;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .submit-btn:hover {
+            background: #b91c1c;
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.65;
+            cursor: not-allowed;
+        }
+
+        .progress-box {
+            display: none;
+            margin-top: 22px;
+            padding: 15px;
+            background: #0b1220;
+            border-radius: 10px;
+        }
+
+        .progress-track {
+            height: 10px;
+            background: #263449;
+            border-radius: 20px;
+            overflow: hidden;
+            margin: 12px 0;
+        }
+
+        .progress-fill {
+            width: 0%;
+            height: 100%;
+            background: #22c55e;
+            transition: width 0.2s;
+        }
+
+        .progress-text {
+            color: #cbd5e1;
+            font-size: 13px;
+        }
+
+        .message {
+            padding: 12px;
+            border-radius: 9px;
+            margin-bottom: 16px;
+            line-height: 1.5;
+        }
+
+        .error {
+            color: #fecaca;
+            background: #451a1a;
+            border: 1px solid #991b1b;
+        }
+
+        .success {
+            color: #bbf7d0;
+            background: #052e16;
+            border: 1px solid #166534;
+        }
+
+        .footer-note {
+            color: #94a3b8;
+            font-size: 12px;
+            line-height: 1.6;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 550px) {
+            .card {
+                padding: 19px;
+            }
+
+            h1 {
+                font-size: 23px;
+            }
+
+            .row {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="topbar">
+        <div class="brand">🚨 ResQNet AI</div>
+        <a class="back-link" href="/dashboard">← Dashboard</a>
+    </div>
+
+    <div class="card">
+
+        <h1>🎥 Upload Evidence</h1>
+
+        <p class="subtitle">
+            Submit incident details and supporting video evidence
+            through a simple and secure form.
+        </p>
+
+        <div class="notice">
+            <strong>Important:</strong>
+            Upload only evidence you are authorized to share.
+            Do not put yourself in danger to record a video.
+            This form does not automatically contact police or
+            emergency services.
+        </div>
+
+        <!-- Flask flash messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+                <div class="message
+                    {% if category == 'error' %}error
+                    {% else %}success{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endwith %}
+
+        <form id="evidenceForm"
+              action="{{ url_for('upload_evidence') }}"
+              method="POST"
+              enctype="multipart/form-data">
+
+            <div class="form-group">
+                <label for="incident_type">Incident Type *</label>
+
+                <select name="incident_type"
+                        id="incident_type"
+                        required>
+
+                    <option value="">Select incident type</option>
+                    <option value="Women Safety">Women Safety</option>
+                    <option value="Road Accident">Road Accident</option>
+                    <option value="Fire">Fire</option>
+                    <option value="Medical Emergency">Medical Emergency</option>
+                    <option value="Crime or Violence">Crime or Violence</option>
+                    <option value="Natural Disaster">Natural Disaster</option>
+                    <option value="Other">Other</option>
+
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="description">Incident Description *</label>
+
+                <textarea
+                    name="description"
+                    id="description"
+                    maxlength="3000"
+                    placeholder="What happened? Include only relevant details."
+                    required></textarea>
+
+                <div class="hint">
+                    Maximum 3000 characters.
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="video">Video Evidence *</label>
+
+                <div class="file-box">
+                    <div class="file-icon">📹</div>
+
+                    <strong>Select an incident video</strong>
+
+                    <p class="hint">
+                        Supported formats: MP4, WEBM and MOV.
+                        Maximum size: 100 MB.
+                    </p>
+
+                    <input
+                        type="file"
+                        name="video"
+                        id="video"
+                        accept=".mp4,.webm,.mov,video/mp4,video/webm,video/quicktime"
+                        required>
+
+                    <div id="fileInfo" class="file-info">
+                        No video selected
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="incident_datetime">
+                    Incident Date and Time
+                </label>
+
+                <input
+                    type="datetime-local"
+                    name="incident_datetime"
+                    id="incident_datetime">
+            </div>
+
+            <div class="form-group">
+                <label>Incident Location</label>
+
+                <div class="row">
+                    <div>
+                        <label for="latitude">Latitude</label>
+                        <input
+                            type="number"
+                            step="any"
+                            name="latitude"
+                            id="latitude"
+                            placeholder="e.g. 27.4924">
+                    </div>
+
+                    <div>
+                        <label for="longitude">Longitude</label>
+                        <input
+                            type="number"
+                            step="any"
+                            name="longitude"
+                            id="longitude"
+                            placeholder="e.g. 77.6737">
+                    </div>
+                </div>
+
+                <button
+                    type="button"
+                    class="location-btn"
+                    id="locationBtn">
+                    📍 Get My Current Location
+                </button>
+
+                <div class="hint" id="locationInfo">
+                    Location is optional. Browser permission is required.
+                </div>
+            </div>
+
+            <div class="row">
+
+                <div class="form-group">
+                    <label for="contact_name">Contact Name</label>
+
+                    <input
+                        type="text"
+                        name="contact_name"
+                        id="contact_name"
+                        maxlength="100"
+                        placeholder="Optional">
+                </div>
+
+                <div class="form-group">
+                    <label for="contact_phone">Contact Phone</label>
+
+                    <input
+                        type="tel"
+                        name="contact_phone"
+                        id="contact_phone"
+                        maxlength="20"
+                        placeholder="Optional">
+                </div>
+
+            </div>
+
+            <label class="consent">
+                <input
+                    type="checkbox"
+                    name="privacy_consent"
+                    value="yes"
+                    id="privacyConsent"
+                    required>
+
+                <span>
+                    I confirm that I am authorized to submit this
+                    evidence and understand that it may be reviewed
+                    by authorized ResQNet administrators.
+                </span>
+            </label>
+
+            <button
+                type="submit"
+                class="submit-btn"
+                id="submitBtn">
+
+                🚀 Submit Evidence
+            </button>
+
+            <div class="progress-box" id="progressBox">
+
+                <strong id="progressTitle">Preparing upload...</strong>
+
+                <div class="progress-track">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+
+                <div class="progress-text" id="progressText">
+                    Please wait.
+                </div>
+
+            </div>
+
+            <div id="formMessage" role="alert"></div>
+
+        </form>
+
+        <p class="footer-note">
+            Your video is uploaded to the ResQNet server and recorded
+            in the evidence database. Only authorized administrators
+            should have access to submitted evidence.
+        </p>
+
+    </div>
+
+</div>
+
+<script>
+    const form = document.getElementById("evidenceForm");
+    const videoInput = document.getElementById("video");
+    const fileInfo = document.getElementById("fileInfo");
+
+    const submitBtn = document.getElementById("submitBtn");
+    const progressBox = document.getElementById("progressBox");
+    const progressFill = document.getElementById("progressFill");
+    const progressText = document.getElementById("progressText");
+    const progressTitle = document.getElementById("progressTitle");
+    const formMessage = document.getElementById("formMessage");
+
+    const locationBtn = document.getElementById("locationBtn");
+    const locationInfo = document.getElementById("locationInfo");
+
+    const MAX_SIZE = 100 * 1024 * 1024;
+
+    const allowedExtensions = ["mp4", "webm", "mov"];
+
+
+    function showMessage(message, type = "error") {
+        formMessage.className = "message " + type;
+        formMessage.textContent = message;
+        formMessage.scrollIntoView({
+            behavior: "smooth",
+            block: "nearest"
+        });
+    }
+
+
+    function formatSize(bytes) {
+        return (bytes / (1024 * 1024)).toFixed(2) + " MB";
+    }
+
+
+    videoInput.addEventListener("change", function () {
+
+        formMessage.textContent = "";
+
+        const file = videoInput.files[0];
+
+        if (!file) {
+            fileInfo.textContent = "No video selected";
+            return;
+        }
+
+        const extension = file.name.split(".").pop().toLowerCase();
+
+        if (!allowedExtensions.includes(extension)) {
+            videoInput.value = "";
+            fileInfo.textContent = "Unsupported file format";
+            showMessage("Please select an MP4, WEBM or MOV video.");
+            return;
+        }
+
+        if (file.size === 0) {
+            videoInput.value = "";
+            fileInfo.textContent = "Empty file";
+            showMessage("Selected video is empty.");
+            return;
+        }
+
+        if (file.size > MAX_SIZE) {
+            videoInput.value = "";
+            fileInfo.textContent = "Video is too large";
+            showMessage(
+                "Video size is " + formatSize(file.size) +
+                ". Maximum allowed size is 100 MB."
+            );
+            return;
+        }
+
+        fileInfo.textContent =
+            "✓ " + file.name + " (" + formatSize(file.size) + ")";
+    });
+
+
+    locationBtn.addEventListener("click", function () {
+
+        if (!navigator.geolocation) {
+            locationInfo.textContent =
+                "Your browser does not support location.";
+            return;
+        }
+
+        locationBtn.disabled = true;
+        locationBtn.textContent = "Getting location...";
+        locationInfo.textContent = "Please allow location access.";
+
+        navigator.geolocation.getCurrentPosition(
+
+            function (position) {
+
+                document.getElementById("latitude").value =
+                    position.coords.latitude.toFixed(7);
+
+                document.getElementById("longitude").value =
+                    position.coords.longitude.toFixed(7);
+
+                locationInfo.textContent =
+                    "✓ Location filled successfully.";
+
+                locationBtn.disabled = false;
+                locationBtn.textContent = "📍 Refresh Location";
+            },
+
+            function (error) {
+
+                const messages = {
+                    1: "Location permission was denied.",
+                    2: "Your location is currently unavailable.",
+                    3: "Location request timed out."
+                };
+
+                locationInfo.textContent =
+                    messages[error.code] ||
+                    "Unable to get location.";
+
+                locationBtn.disabled = false;
+                locationBtn.textContent = "📍 Try Again";
+            },
+
+            {
+                enableHighAccuracy: false,
+                timeout: 10000,
+                maximumAge: 60000
+            }
+        );
+    });
+
+
+    form.addEventListener("submit", function (event) {
+
+        const file = videoInput.files[0];
+
+        if (!file) {
+            event.preventDefault();
+            showMessage("Please select a video.");
+            return;
+        }
+
+        if (file.size > MAX_SIZE || file.size === 0) {
+            event.preventDefault();
+            showMessage("Select a valid video up to 100 MB.");
+            return;
+        }
+
+        if (!document.getElementById("privacyConsent").checked) {
+            event.preventDefault();
+            showMessage("Please confirm the privacy acknowledgement.");
+            return;
+        }
+
+        /*
+         * Keep normal form submission as a fallback.
+         * Upload progress is enhanced below when XMLHttpRequest
+         * is supported.
+         */
+
+        if (!window.XMLHttpRequest) {
+            return;
+        }
+
+        event.preventDefault();
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Uploading...";
+        progressBox.style.display = "block";
+        progressTitle.textContent = "Uploading evidence...";
+        progressText.textContent = "Starting upload...";
+        formMessage.textContent = "";
+
+        const xhr = new XMLHttpRequest();
+
+        xhr.open("POST", form.action, true);
+
+        xhr.upload.addEventListener("progress", function (e) {
+
+            if (e.lengthComputable) {
+
+                const percent = Math.round(
+                    (e.loaded / e.total) * 100
+                );
+
+                progressFill.style.width = percent + "%";
+
+                progressText.textContent =
+                    percent + "% uploaded (" +
+                    formatSize(e.loaded) + " / " +
+                    formatSize(e.total) + ")";
+
+                if (percent >= 100) {
+                    progressTitle.textContent =
+                        "Upload complete. Saving evidence...";
+                    progressText.textContent =
+                        "Waiting for the server to verify and save the video.";
+                }
+            }
+        });
+
+        xhr.addEventListener("load", function () {
+
+            if (
+                xhr.status >= 200 &&
+                xhr.status < 400 &&
+                xhr.responseURL
+            ) {
+                window.location.href = xhr.responseURL;
+                return;
+            }
+
+            submitBtn.disabled = false;
+            submitBtn.textContent = "🚀 Submit Evidence";
+
+            showMessage(
+                "Upload could not be completed. Please try again."
+            );
+        });
+
+        xhr.addEventListener("error", function () {
+
+            submitBtn.disabled = false;
+            submitBtn.textContent = "🚀 Submit Evidence";
+
+            showMessage(
+                "Network error. Check your internet or local server and try again."
+            );
+        });
+
+        xhr.addEventListener("abort", function () {
+
+            submitBtn.disabled = false;
+            submitBtn.textContent = "🚀 Submit Evidence";
+
+            showMessage("Upload was cancelled.");
+        });
+
+        xhr.send(new FormData(form));
+    });
+</script>
+
+</body>
+</html>

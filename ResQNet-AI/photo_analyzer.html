@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>AI Photo Analyzer | ResQNet AI</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 25px;
+            font-family: Arial, sans-serif;
+            background: #080b14;
+            color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 850px;
+            margin: 35px auto;
+        }
+
+        .card {
+            background: #101525;
+            border: 1px solid #252d42;
+            border-radius: 15px;
+            padding: 28px;
+            margin-bottom: 22px;
+        }
+
+        h1 {
+            color: #ff5263;
+            margin-top: 0;
+        }
+
+        p {
+            color: #c5ccda;
+            line-height: 1.7;
+        }
+
+        input[type="file"] {
+            display: block;
+            width: 100%;
+            margin: 20px 0;
+            padding: 14px;
+            background: #080b14;
+            color: white;
+            border: 1px solid #39435a;
+            border-radius: 8px;
+        }
+
+        button {
+            padding: 13px 22px;
+            background: #e63950;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background: #c9233a;
+        }
+
+        .result {
+            padding: 18px;
+            background: #171f32;
+            border-left: 4px solid #ff5263;
+            border-radius: 8px;
+        }
+
+        .preview {
+            display: block;
+            max-width: 100%;
+            max-height: 400px;
+            margin-top: 20px;
+            border-radius: 10px;
+        }
+
+        .warning {
+            color: #ffd166;
+        }
+
+        a {
+            color: #7db5ff;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="card">
+
+        <h1>📸 AI Emergency Photo Analyzer</h1>
+
+        <p>
+            Upload a photo related to an emergency incident.
+            ResQNet AI will validate the image and prepare it
+            for further review.
+        </p>
+
+        <p class="warning">
+            Note: This version does not automatically detect
+            fire, flooding, accidents or other hazards.
+        </p>
+
+        <form method="POST"
+              enctype="multipart/form-data">
+
+            <label for="emergency_photo">
+                Select Emergency Photo
+            </label>
+
+            <input
+                type="file"
+                id="emergency_photo"
+                name="emergency_photo"
+                accept=".jpg,.jpeg,.png,.webp"
+                required
+            >
+
+            <button type="submit">
+                Upload & Analyze
+            </button>
+
+        </form>
+
+    </div>
+
+    {% if result %}
+
+    <div class="card">
+
+        <h2>Analysis Result</h2>
+
+        <div class="result">
+
+            <p>{{ result.message }}</p>
+
+            {% if result.success %}
+
+            <p>
+                <strong>Image Format:</strong>
+                {{ result.format }}
+            </p>
+
+            <p>
+                <strong>Image Width:</strong>
+                {{ result.width }} pixels
+            </p>
+
+            <p>
+                <strong>Image Height:</strong>
+                {{ result.height }} pixels
+            </p>
+
+            {% endif %}
+
+        </div>
+
+        {% if photo_url %}
+
+        <h3>Uploaded Image</h3>
+
+        <img
+            class="preview"
+            src="{{ photo_url }}"
+            alt="Uploaded emergency evidence"
+        >
+
+        {% endif %}
+
+    </div>
+
+    {% endif %}
+
+    <p>
+        <a href="{{ url_for('home') }}">
+            ← Back to Home
+        </a>
+    </p>
+
+</div>
+
+</body>
+</html>
