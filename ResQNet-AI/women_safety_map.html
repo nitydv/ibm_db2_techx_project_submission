@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Women Safety Map | ResQNet AI</title>
+
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    >
+
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #080b14;
+            color: #f8fafc;
+            font-family: Arial, sans-serif;
+        }
+
+        h1 span {
+            color: #fb7185;
+        }
+
+        p {
+            color: #cbd5e1;
+            line-height: 1.6;
+        }
+
+        a {
+            color: #fda4af;
+        }
+
+        #map {
+            width: 100%;
+            height: 70vh;
+            min-height: 400px;
+            margin-top: 20px;
+            border: 1px solid #334155;
+            border-radius: 14px;
+        }
+
+        .notice {
+            padding: 12px;
+            border: 1px solid #854d0e;
+            border-radius: 8px;
+            color: #fde68a;
+            background: #33251a;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>ResQNet <span>AI</span> — Women Safety Map</h1>
+
+    <p>
+        Reports with available coordinates are displayed on this map.
+        Markers represent submitted reports, not verified incidents or
+        confirmed dangerous areas.
+    </p>
+
+    <div class="notice">
+        Privacy notice: location data can be sensitive. This prototype
+        does not automatically contact emergency services.
+    </div>
+
+    <p><a href="{{ url_for('women_safety') }}">Back to Women Safety Center</a></p>
+
+    <div id="map"></div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script id="report-data" type="application/json">
+        {{ reports | tojson }}
+    </script>
+
+    <script>
+        const map = L.map("map").setView([20.5937, 78.9629], 5);
+
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+            attribution: "&copy; OpenStreetMap contributors"
+        }).addTo(map);
+
+        const reports = JSON.parse(
+            document.getElementById("report-data").textContent
+        );
+
+        const bounds = [];
+
+        reports.forEach(function (report) {
+            const point = [
+                report.latitude,
+                report.longitude
+            ];
+
+            const marker = L.marker(point).addTo(map);
+
+            const popup = document.createElement("div");
+            const title = document.createElement("strong");
+            const status = document.createElement("p");
+
+            title.textContent =
+                "Report #" + report.id + " — " + report.incident_type;
+
+            status.textContent =
+                "Status: " + (report.status || "Pending");
+
+            popup.appendChild(title);
+            popup.appendChild(status);
+
+            marker.bindPopup(popup);
+            bounds.push(point);
+        });
+
+        if (bounds.length > 0) {
+            map.fitBounds(bounds, { padding: [30, 30] });
+        }
+    </script>
+</body>
+</html>

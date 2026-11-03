@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Analytics Dashboard | ResQNet AI</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+
+<nav>
+    <div class="logo">ResQNet <span>AI</span></div>
+
+    <div class="nav-links">
+        <a href="/">Home</a>
+        <a href="/report">Report Emergency</a>
+        <a href="/dashboard">Command Center</a>
+        <a href="/map">Emergency Map</a>
+        <a href="/responders">Responders</a>
+    </div>
+</nav>
+
+<main class="analytics-page">
+
+    <header class="analytics-header">
+        <p class="tag">INTELLIGENCE &amp; REPORTING</p>
+        <h1>Analytics Dashboard</h1>
+        <p>Monitor emergency patterns and response operations.</p>
+    </header>
+
+    <div class="analytics-notice">
+        Analytics are based on recorded incidents.
+        Severity estimates require human verification.
+    </div>
+
+    <!-- Statistics -->
+    <section class="analytics-stats">
+
+        <article class="analytics-stat">
+            <span>Total Incidents</span>
+            <strong>{{ stats.total }}</strong>
+        </article>
+
+        <article class="analytics-stat">
+            <span>Pending</span>
+            <strong>{{ stats.pending }}</strong>
+        </article>
+
+        <article class="analytics-stat">
+            <span>In Progress</span>
+            <strong>{{ stats.in_progress }}</strong>
+        </article>
+
+        <article class="analytics-stat">
+            <span>Resolved</span>
+            <strong>{{ stats.resolved }}</strong>
+        </article>
+
+        <article class="analytics-stat">
+            <span>Critical</span>
+            <strong>{{ stats.critical }}</strong>
+        </article>
+
+        <article class="analytics-stat">
+            <span>Registered Responders</span>
+            <strong>{{ stats.responders }}</strong>
+        </article>
+
+    </section>
+
+    <!-- Charts -->
+    <section class="analytics-grid">
+
+        <article class="chart-panel">
+            <h2>Incident Status</h2>
+            <canvas id="statusChart"></canvas>
+        </article>
+
+        <article class="chart-panel">
+            <h2>Severity Distribution</h2>
+            <canvas id="severityChart"></canvas>
+        </article>
+
+        <article class="chart-panel">
+            <h2>Emergency Types</h2>
+            <canvas id="typeChart"></canvas>
+        </article>
+
+        <article class="chart-panel">
+            <h2>Incidents Recorded Per Day</h2>
+            <canvas id="trendChart"></canvas>
+        </article>
+
+    </section>
+
+    <!-- Recent Incidents -->
+    <section class="analytics-table-panel">
+
+        <h2>Recent Incidents</h2>
+
+        {% if recent_incidents %}
+
+        <div class="table-wrapper">
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Emergency</th>
+                        <th>Severity</th>
+                        <th>Priority</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for incident in recent_incidents %}
+                    <tr>
+                        <td>#{{ incident.id }}</td>
+
+                        <td>
+                            {{ incident.emergency_type }}
+                        </td>
+
+                        <td>
+                            {{ incident.severity or "Not Analyzed" }}
+                        </td>
+
+                        <td>
+                            {{ incident.priority or "P3" }}
+                        </td>
+
+                        <td>
+                            {{ incident.status or "Pending" }}
+                        </td>
+
+                        <td>
+                            {% if incident.created_at %}
+                                {{ incident.created_at.strftime("%d-%m-%Y %H:%M") }}
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+
+            </table>
+
+        </div>
+
+        {% else %}
+
+            <p>No incidents available for analysis.</p>
+
+        {% endif %}
+
+    </section>
+
+</main>
+
+<!-- Chart Data -->
+<script id="analytics-data" type="application/json">
+{
+    "statusLabels": {{ status_labels | tojson }},
+    "statusValues": {{ status_values | tojson }},
+    "severityLabels": {{ severity_labels | tojson }},
+    "severityValues": {{ severity_values | tojson }},
+    "typeLabels": {{ type_labels | tojson }},
+    "typeValues": {{ type_values | tojson }},
+    "trendLabels": {{ trend_labels | tojson }},
+    "trendValues": {{ trend_values | tojson }}
+}
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const dataElement = document.getElementById("analytics-data");
+
+    if (typeof Chart === "undefined") {
+        console.error("Chart.js could not load. Check your internet connection.");
+        return;
+    }
+
+    let analyticsData;
+
+    try {
+        analyticsData = JSON.parse(dataElement.textContent);
+    } catch (error) {
+        console.error("Unable to read analytics data:", error);
+        return;
+    }
+
+    Chart.defaults.color = "#cbd5e1";
+    Chart.defaults.font.family = "Arial";
+
+    function createChart(elementId, type, labels, values, colors, label) {
+
+        const canvas = document.getElementById(elementId);
+
+        if (!canvas) {
+            return;
+        }
+
+        new Chart(canvas, {
+            type: type,
+
+            data: {
+                labels: labels,
+
+                datasets: [{
+                    label: label || "Incidents",
+                    data: values,
+                    backgroundColor: colors,
+                    borderColor: type === "line" ? "#38bdf8" : undefined,
+                    fill: type === "line",
+                    tension: 0.3,
+                    borderWidth: 1
+                }]
+            },
+
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+
+                scales: ["bar", "line"].includes(type) ? {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0
+                        }
+                    }
+                } : {},
+
+                plugins: {
+                    legend: {
+                        display: true
+                    }
+                }
+            }
+        });
+    }
+
+    createChart(
+        "statusChart",
+        "doughnut",
+        analyticsData.statusLabels,
+        analyticsData.statusValues,
+        ["#f59e0b", "#3b82f6", "#22c55e", "#64748b"],
+        "Incident Status"
+    );
+
+    createChart(
+        "severityChart",
+        "bar",
+        analyticsData.severityLabels,
+        analyticsData.severityValues,
+        ["#ef4444", "#f97316", "#eab308", "#22c55e", "#64748b"],
+        "Severity"
+    );
+
+    createChart(
+        "typeChart",
+        "pie",
+        analyticsData.typeLabels,
+        analyticsData.typeValues,
+        ["#ef4444", "#3b82f6", "#22c55e", "#f59e0b", "#a855f7", "#06b6d4", "#ec4899"],
+        "Emergency Type"
+    );
+
+    createChart(
+        "trendChart",
+        "line",
+        analyticsData.trendLabels,
+        analyticsData.trendValues,
+        "#38bdf8",
+        "Incidents per Day"
+    );
+
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Report Emergency | ResQNet AI</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<nav>
+    <div class="logo">ResQNet <span>AI</span></div>
+
+    <div class="nav-links">
+        <a href="/">Home</a>
+        <a href="/dashboard">Command Center</a>
+    </div>
+</nav>
+
+<main class="report-page">
+
+    <section class="report-header">
+        <p class="tag">RESQNET EMERGENCY NETWORK</p>
+
+        <h1>🚨 Report Emergency</h1>
+
+        <p>
+            Share emergency details and available location information
+            to help responders assess the incident.
+        </p>
+    </section>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="flash-message {{ category }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <section class="report-box">
+
+        <div class="form-heading">
+            <h2>Emergency Information</h2>
+            <p>Fields marked * are required.</p>
+        </div>
+
+        <form action="{{ url_for('submit_report') }}"
+              method="POST">
+
+            <div class="form-group">
+                <label for="emergency_type">
+                    Emergency Type *
+                </label>
+
+                <select id="emergency_type"
+                        name="emergency_type"
+                        required>
+
+                    <option value="">Select emergency type</option>
+                    <option value="Road Accident">Road Accident</option>
+                    <option value="Fire">Fire</option>
+                    <option value="Flood">Flood</option>
+                    <option value="Medical Emergency">Medical Emergency</option>
+                    <option value="Building Damage">Building Damage</option>
+                    <option value="Other">Other</option>
+
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="description">
+                    Emergency Description *
+                </label>
+
+                <textarea id="description"
+                          name="description"
+                          rows="5"
+                          maxlength="3000"
+                          placeholder="Describe what happened, any visible danger, and whether anyone may need assistance..."
+                          required></textarea>
+
+                <small>
+                    Provide only information you know or have observed.
+                </small>
+            </div>
+
+            <div class="form-group">
+
+                <label>Emergency Location</label>
+
+                <div class="location-panel">
+
+                    <div class="location-icon">📍</div>
+
+                    <div class="location-content">
+                        <strong>Share your current location</strong>
+
+                        <p id="location">
+                            Location not captured. You can submit without it.
+                        </p>
+                    </div>
+
+                    <button type="button"
+                            class="location-btn"
+                            onclick="getLocation()">
+                        Get My Location
+                    </button>
+
+                </div>
+
+                <input type="hidden"
+                       name="latitude"
+                       id="latitude">
+
+                <input type="hidden"
+                       name="longitude"
+                       id="longitude">
+
+            </div>
+
+            <div class="privacy-note">
+                <strong>Privacy:</strong>
+                Location sharing is optional. Submit only accurate
+                information and avoid including unnecessary personal details.
+            </div>
+
+            <button type="submit" class="submit-btn">
+                🚨 Submit Emergency Report
+            </button>
+
+            <a href="/" class="cancel-link">
+                Cancel and return home
+            </a>
+
+        </form>
+
+    </section>
+
+    <p class="safety-note">
+        ResQNet AI is a prototype. AI assessments are preliminary and
+        must be verified by responsible emergency personnel. For a real
+        emergency in India, call 112.
+    </p>
+
+</main>
+
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+</body>
+</html>

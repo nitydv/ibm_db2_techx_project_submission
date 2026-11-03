@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Anonymous Reports | ResQNet AI</title>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background: #080d18;
+            color: white;
+        }
+
+        h1 {
+            color: #60a5fa;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+            background: #111827;
+            padding: 15px;
+            border-radius: 12px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            min-width: 850px;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid #334155;
+            vertical-align: top;
+        }
+
+        th {
+            color: #93c5fd;
+        }
+
+        select, textarea {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0;
+            background: #0b1220;
+            color: white;
+            border: 1px solid #334155;
+            border-radius: 6px;
+        }
+
+        textarea {
+            min-height: 60px;
+        }
+
+        button {
+            padding: 9px 12px;
+            background: #2563eb;
+            color: white;
+            border: 0;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        a {
+            color: #93c5fd;
+        }
+
+        .muted {
+            color: #cbd5e1;
+            max-width: 260px;
+            overflow-wrap: anywhere;
+        }
+    </style>
+</head>
+
+<body>
+
+<h1>🛡️ Anonymous Crime Reports</h1>
+
+<p>
+    Private review area. Only authorized administrators should access this page.
+</p>
+
+<p>
+    <a href="{{ url_for('dashboard') }}">← Dashboard</a>
+</p>
+
+<div class="table-wrap">
+
+    <table>
+        <thead>
+            <tr>
+                <th>Tracking ID</th>
+                <th>Category</th>
+                <th>Description</th>
+                <th>Incident Time</th>
+                <th>Location</th>
+                <th>Video</th>
+                <th>Status & Notes</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+        {% for report in reports %}
+
+            <tr>
+                <td>{{ report.tracking_id }}</td>
+
+                <td>{{ report.crime_type }}</td>
+
+                <td class="muted">
+                    {{ report.description }}
+                </td>
+
+                <td>
+                    {{ report.incident_datetime or 'Not provided' }}
+                </td>
+
+                <td>
+                    {% if report.latitude is not none and report.longitude is not none %}
+                        {{ report.latitude }}, {{ report.longitude }}
+                        <br>
+                        <a
+                            href="https://www.google.com/maps?q={{ report.latitude }},{{ report.longitude }}"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            View Map
+                        </a>
+                    {% else %}
+                        Not provided
+                    {% endif %}
+                </td>
+
+                <td>
+                    <a
+                        href="{{ url_for('admin_anonymous_crime_video', report_id=report.id) }}"
+                    >
+                        Download Evidence
+                    </a>
+
+                    <p class="muted">
+                        {{ report.original_filename }}
+                    </p>
+                </td>
+
+                <td>
+
+                    <form
+                        method="POST"
+                        action="{{ url_for('admin_update_anonymous_crime_status', report_id=report.id) }}"
+                    >
+
+                        <select name="status">
+                            {% for status in ['Submitted', 'Under Review', 'Verified', 'Rejected'] %}
+                                <option
+                                    value="{{ status }}"
+                                    {% if report.status == status %}selected{% endif %}
+                                >
+                                    {{ status }}
+                                </option>
+                            {% endfor %}
+                        </select>
+
+                        <textarea
+                            name="admin_notes"
+                            maxlength="3000"
+                            placeholder="Internal review notes"
+                        >{{ report.admin_notes or '' }}</textarea>
+
+                        <button type="submit">
+                            Update Status
+                        </button>
+
+                    </form>
+
+                </td>
+            </tr>
+
+        {% else %}
+
+            <tr>
+                <td colspan="7">No anonymous reports have been submitted.</td>
+            </tr>
+
+        {% endfor %}
+
+        </tbody>
+    </table>
+
+</div>
+
+</body>
+</html>

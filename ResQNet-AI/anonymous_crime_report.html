@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Anonymous Crime Reporter | ResQNet AI</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #080d18;
+            color: #f1f5f9;
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            max-width: 720px;
+            margin: auto;
+        }
+
+        .card {
+            background: #111827;
+            border: 1px solid #263449;
+            border-radius: 16px;
+            padding: 25px;
+        }
+
+        h1 {
+            color: #60a5fa;
+        }
+
+        p {
+            color: #cbd5e1;
+            line-height: 1.6;
+        }
+
+        label {
+            display: block;
+            margin: 18px 0 8px;
+            font-weight: bold;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            background: #0b1220;
+            color: white;
+        }
+
+        textarea {
+            min-height: 110px;
+            resize: vertical;
+        }
+
+        .notice {
+            background: #172554;
+            border: 1px solid #2563eb;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .consent {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            margin: 20px 0;
+            line-height: 1.5;
+        }
+
+        .consent input {
+            width: 18px;
+            margin-top: 3px;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            border: 0;
+            border-radius: 8px;
+            background: #dc2626;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .message {
+            padding: 12px;
+            border-radius: 8px;
+            margin: 10px 0;
+            background: #451a1a;
+        }
+
+        .links {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        a {
+            color: #93c5fd;
+        }
+
+        .small {
+            font-size: 12px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <div class="card">
+
+        <h1>🕵️ Anonymous Crime Reporter</h1>
+
+        <p>
+            Submit crime-related information and video evidence
+            without entering your name, email, or phone number.
+        </p>
+
+        <div class="notice">
+            <strong>Safety first</strong>
+            <p>
+                Do not approach a suspect or put yourself in danger
+                to record evidence. This prototype does not
+                automatically send reports to the police.
+            </p>
+            <p>
+                Anonymous reporting does not guarantee that technical
+                information or video metadata cannot identify you.
+            </p>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+                <div class="message">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endwith %}
+
+        <form
+            id="crimeForm"
+            method="POST"
+            enctype="multipart/form-data"
+            action="{{ url_for('anonymous_crime_report') }}"
+        >
+
+            <label for="crime_type">Crime Category *</label>
+
+            <select name="crime_type" id="crime_type" required>
+                <option value="">Select category</option>
+                <option>Robbery / Theft</option>
+                <option>Assault / Violence</option>
+                <option>Harassment</option>
+                <option>Suspicious Activity</option>
+                <option>Vandalism</option>
+                <option>Other</option>
+            </select>
+
+            <label for="description">Incident Description *</label>
+
+            <textarea
+                name="description"
+                id="description"
+                maxlength="3000"
+                required
+                placeholder="Describe what happened."
+            ></textarea>
+
+            <label for="video">Video Evidence *</label>
+
+            <input
+                type="file"
+                name="video"
+                id="video"
+                accept=".mp4,.mov,.webm,video/mp4,video/quicktime,video/webm"
+                required
+            >
+
+            <p class="small">
+                MP4, MOV or WEBM. Maximum 50 MB.
+            </p>
+
+            <label for="incident_datetime">
+                Incident Date and Time
+            </label>
+
+            <input
+                type="datetime-local"
+                name="incident_datetime"
+                id="incident_datetime"
+            >
+
+            <button
+                type="button"
+                id="locationBtn"
+                style="margin-top:10px;background:#1d4ed8;"
+            >
+                📍 Use Current Location
+            </button>
+
+            <p id="locationMessage" class="small"></p>
+
+            <label class="consent">
+                <input
+                    type="checkbox"
+                    name="privacy_consent"
+                    value="yes"
+                    required
+                >
+
+                <span>
+                    I confirm that I am authorized to submit this
+                    evidence and understand that authorized
+                    administrators may review it.
+                </span>
+            </label>
+
+            <button type="submit" id="submitBtn">
+                Submit Anonymous Report
+            </button>
+
+        </form>
+
+        <div class="links">
+            <a href="{{ url_for('anonymous_crime_track') }}">
+                Track Existing Report
+            </a>
+
+            <a href="{{ url_for('dashboard') }}">
+            Home
+             </a>
+        </div>
+
+        <p class="small">
+            For immediate danger in India, contact emergency
+            services at 112. Do not wait for this form to be reviewed.
+        </p>
+
+    </div>
+</div>
+
+<script>
+    const videoInput = document.getElementById("video");
+    const form = document.getElementById("crimeForm");
+    const submitBtn = document.getElementById("submitBtn");
+
+    const MAX_SIZE = 50 * 1024 * 1024;
+    const allowed = ["mp4", "mov", "webm"];
+
+    videoInput.addEventListener("change", function () {
+        const file = this.files[0];
+
+        if (!file) return;
+
+        const extension = file.name.split(".").pop().toLowerCase();
+
+        if (!allowed.includes(extension)) {
+            alert("Please choose an MP4, MOV or WEBM video.");
+            this.value = "";
+            return;
+        }
+
+        if (file.size === 0 || file.size > MAX_SIZE) {
+            alert("Video must be greater than 0 bytes and no larger than 50 MB.");
+            this.value = "";
+        }
+    });
+
+    form.addEventListener("submit", function (event) {
+        const file = videoInput.files[0];
+
+        if (!file || file.size === 0 || file.size > MAX_SIZE) {
+            event.preventDefault();
+            alert("Please select a valid video up to 50 MB.");
+            return;
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Submitting...";
+
+        // If submission fails, reload the page before trying again.
+    });
+
+    document.getElementById("locationBtn").addEventListener("click", function () {
+        const message = document.getElementById("locationMessage");
+
+        if (!navigator.geolocation) {
+            message.textContent = "Location is not supported by this browser.";
+            return;
+        }
+
+        message.textContent = "Requesting location permission...";
+
+        navigator.geolocation.getCurrentPosition(
+            function (position) {
+                document.getElementById("latitude").value =
+                    position.coords.latitude.toFixed(7);
+
+                document.getElementById("longitude").value =
+                    position.coords.longitude.toFixed(7);
+
+                message.textContent = "Location added.";
+            },
+            function () {
+                message.textContent =
+                    "Location unavailable. You can enter coordinates manually.";
+            },
+            {
+                enableHighAccuracy: false,
+                timeout: 10000,
+                maximumAge: 60000
+            }
+        );
+    });
+</script>
+
+</body>
+</html>

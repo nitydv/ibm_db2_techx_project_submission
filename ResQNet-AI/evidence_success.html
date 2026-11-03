@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Evidence Submitted | ResQNet AI</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+        .success-container {
+            max-width: 650px;
+            margin: 80px auto;
+            padding: 35px;
+            text-align: center;
+            background: #111827;
+            color: white;
+            border-radius: 16px;
+        }
+
+        .success-icon {
+            font-size: 60px;
+        }
+
+        .success-id {
+            display: inline-block;
+            margin: 20px 0;
+            padding: 12px 20px;
+            background: #1e293b;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+
+<body>
+
+<main class="success-container">
+
+    <div class="success-icon">✅</div>
+
+    <h1>Evidence Submitted Successfully</h1>
+
+    <p>
+        Your incident report has been recorded.
+        It will require review by authorized personnel.
+    </p>
+
+    <div class="success-id">
+        Evidence Reference ID:
+        <strong>#{{ evidence_id }}</strong>
+    </div>
+
+    <p>
+        Submission does not mean the incident has been independently verified.
+    </p>
+
+    <a href="{{ url_for('upload_evidence') }}" class="btn emergency">
+        Submit Another Report
+    </a>
+
+    <a href="{{ url_for('index') }}" class="btn secondary">
+        Return Home
+    </a>
+
+</main>
+
+</body>
+</html>

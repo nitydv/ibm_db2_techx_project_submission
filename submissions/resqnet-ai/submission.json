@@ -1,0 +1,18 @@
+{
+"project_name": "ResQNet AI",
+"project_slug": "resqnet-ai",
+"tagline": "Intelligent Emergency Response Network",
+"team_name": "ETHIX",
+"team_leader": "Shadab Khan",
+"technologies": [
+"Python",
+"Flask",
+"MySQL",
+"IBM Db2",
+"HTML",
+"CSS",
+"JavaScript"
+],
+"database": "IBM Db2 Community Edition",
+"description": "An intelligent emergency response platform for incident reporting, responder coordination, emergency monitoring and women's safety."
+}
